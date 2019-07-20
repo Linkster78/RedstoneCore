@@ -36,6 +36,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.tek.rcore.RedstoneCore;
 import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.events.InterfaceCloseEvent;
 
@@ -53,7 +54,7 @@ public class InterfaceInteractionListener implements Listener {
 		int x = InventoryUtils.slotToX(event.getRawSlot());
 		int y = InventoryUtils.slotToY(event.getRawSlot());
 		
-		if(!a.equals(NOTHING)&& !a.equals(NOTHING)) {
+		if(!a.equals(NOTHING) && !a.equals(NOTHING)) {
 			Optional<List<InterfaceState>> interfaceStates = instance.getInterfaceStates(event.getWhoClicked().getUniqueId());
 			if(interfaceStates.isPresent()) {
 				InterfaceState current = interfaceStates.get().get(0);
@@ -141,25 +142,32 @@ public class InterfaceInteractionListener implements Listener {
 				}
 			}
 			
-			ItemStack toDivide = event.getOldCursor();
-			int perSlot = event.getType().equals(DragType.SINGLE) ? 1 : (int) Math.floor((double)toDivide.getAmount() / (double)slotCount);
-			int remaining = toDivide.getAmount();
-			for(Integer slot : event.getRawSlots()) {
-				ItemStack atSlot = event.getView().getItem(slot);
-				if(atSlot == null) {
-					remaining -= perSlot;
-					continue;
+			if(event.getRawSlots().isEmpty()) {
+				event.setCancelled(true);
+			} else {
+				ItemStack toDivide = event.getOldCursor();
+				int perSlot = event.getType().equals(DragType.SINGLE) ? 1 : (int) Math.floor((double)toDivide.getAmount() / (double)slotCount);
+				int remaining = toDivide.getAmount();
+				for(Integer slot : event.getRawSlots()) {
+					ItemStack atSlot = event.getView().getItem(slot);
+					if(atSlot == null || atSlot.getType().equals(Material.AIR)) {
+						remaining -= perSlot;
+						continue;
+					}
+					remaining -= Math.min(perSlot, atSlot.getMaxStackSize() - atSlot.getAmount());
 				}
-				remaining -= Math.min(perSlot, atSlot.getMaxStackSize() - atSlot.getAmount());
+				ItemStack cursorItem = event.getOldCursor();
+				cursorItem.setAmount(remaining);
+				event.setCursor(cursorItem);
+				
+				Map<Integer, ItemStack> changeMap = new HashMap<Integer, ItemStack>();
+				event.getNewItems().forEach(changeMap::put);
+				interfaceStates.get().get(0).onChange(changeMap);
+				
+				RedstoneCore.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(RedstoneCore.getInstance(), () -> {
+					interfaceStates.get().get(0).render();
+				}, 0);
 			}
-			int removedSlots = slotCount - event.getRawSlots().size();
-			ItemStack cursorItem = event.getOldCursor();
-			cursorItem.setAmount(remaining + removedSlots * perSlot);
-			event.setCursor(cursorItem);
-			
-			Map<Integer, ItemStack> changeMap = new HashMap<Integer, ItemStack>();
-			event.getNewItems().forEach(changeMap::put);
-			interfaceStates.get().get(0).onChange(changeMap);
 		}
 	}
 	

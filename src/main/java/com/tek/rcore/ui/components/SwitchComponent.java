@@ -13,6 +13,25 @@ public class SwitchComponent extends InterfaceComponent {
 	private ItemStack off, on;
 	private WrappedProperty<Boolean> state;
 	
+	public SwitchComponent(int x, int y, ItemStack icon) {
+		this(x, y, 1, 1, icon, false);
+	}
+	
+	public SwitchComponent(int x, int y, ItemStack icon, boolean defaultState) {
+		this(x, y, 1, 1, icon, defaultState);
+	}
+	
+	public SwitchComponent(int x, int y, int width, int height, ItemStack icon) {
+		this(x, y, width, height, icon, false);
+	}
+	
+	public SwitchComponent(int x, int y, int width, int height, ItemStack icon, boolean defaultState) {
+		super(x, y, width, height);
+		this.off = InventoryUtils.hideGlow(icon);
+		this.on = InventoryUtils.addGlow(icon);
+		this.state = new WrappedProperty<Boolean>(defaultState);
+	}
+	
 	public SwitchComponent(int x, int y, ItemStack off, ItemStack on) {
 		this(x, y, 1, 1, off, on, false);
 	}

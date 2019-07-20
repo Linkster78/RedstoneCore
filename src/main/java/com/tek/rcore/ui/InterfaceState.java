@@ -173,6 +173,10 @@ public abstract class InterfaceState {
 		this.uuid = uuid;
 	}
 	
+	public UUID getUUID() {
+		return uuid;
+	}
+	
 	public Player getOwner() {
 		return Bukkit.getPlayer(uuid);
 	}

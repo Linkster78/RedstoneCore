@@ -5,3 +5,5 @@ author: RedstoneTek
 version: 1.0
 api-version: 1.14
 main: com.tek.rcore.RedstoneCore
+
+load: STARTUP
