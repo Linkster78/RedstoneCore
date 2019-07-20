@@ -39,6 +39,21 @@ public class InventoryComponent extends InterfaceComponent {
 	}
 	
 	@Override
+	public void tick(InterfaceState interfaceState) {
+		boolean changed = false;
+		for(int x = 0; x < width; x++) {
+			for(int y = 0; y < height; y++) {
+				ItemStack item = inventoryContents.getValue()[x][y];
+				if(item != null && (item.getAmount() <= 0 || item.getType().equals(Material.AIR))) {
+					inventoryContents.getValue()[x][y] = null;
+					changed = true;
+				}
+			}
+		}
+		if(changed) inventoryContents.notifyChange();
+	}
+	
+	@Override
 	public void render(InterfaceState interfaceState, ItemStack[][] drawBuffer) {
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
@@ -69,8 +84,7 @@ public class InventoryComponent extends InterfaceComponent {
 		List<ItemStack> contentItems = new ArrayList<ItemStack>();
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
-				if(inventoryContents.getValue()[x][y] != null && !inventoryContents.getValue()[x][y].getType().equals(Material.AIR))
-					contentItems.add(inventoryContents.getValue()[x][y]);
+				if(inventoryContents.getValue()[x][y] != null) contentItems.add(inventoryContents.getValue()[x][y]);
 			}
 		}
 		return contentItems;
