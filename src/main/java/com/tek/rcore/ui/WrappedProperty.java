@@ -10,12 +10,12 @@ public class WrappedProperty<T> {
 	private T value;
 	
 	public WrappedProperty(T defaultValue) {
-		this.watchers = new ArrayList<Consumer<T>>();
+		this.watchers = new ArrayList<Consumer<T>>(4);
 		this.value = defaultValue;
 	}
 	
 	public WrappedProperty() {
-		this.watchers = new ArrayList<Consumer<T>>();
+		this.watchers = new ArrayList<Consumer<T>>(4);
 	}
 	
 	public void setValue(T value) {
