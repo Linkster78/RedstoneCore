@@ -23,5 +23,9 @@ public class StaticComponent extends InterfaceComponent {
 	public void render(InterfaceState interfaceState, ItemStack[][] drawBuffer) {
 		InventoryUtils.drawFilledRectangle(drawBuffer, item, x, y, width, height);
 	}
+	
+	public void setItem(ItemStack item) {
+		this.item = item;
+	}
 
 }

@@ -37,5 +37,9 @@ public class ButtonComponent extends InterfaceComponent {
 	public WrappedProperty<ButtonClickEvent> getClickedProperty() {
 		return clicked;
 	}
+	
+	public void setItem(ItemStack item) {
+		this.item = item;
+	}
 
 }
