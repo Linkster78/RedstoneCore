@@ -38,6 +38,10 @@ public class ButtonComponent extends InterfaceComponent {
 		return clicked;
 	}
 	
+	public ItemStack getItem() {
+		return item;
+	}
+	
 	public void setItem(ItemStack item) {
 		this.item = item;
 	}
