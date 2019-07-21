@@ -11,8 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.tek.rcore.ui.events.InterfaceCloseEvent;
-
 public class InterfaceManager {
 	
 	private Plugin instance;
@@ -49,6 +47,7 @@ public class InterfaceManager {
 	}
 	
 	public void removeInterfaceLayer(Player player) {
+		if(!userInterfaces.containsKey(player.getUniqueId())) return;
 		userInterfaces.get(player.getUniqueId()).remove(0);
 		if(userInterfaces.get(player.getUniqueId()).isEmpty()) {
 			userInterfaces.remove(player.getUniqueId());
@@ -60,11 +59,6 @@ public class InterfaceManager {
 	}
 	
 	public void closeInterface(Player player) {
-		List<InterfaceState> interfaces = userInterfaces.get(player.getUniqueId());
-		for(InterfaceState interfaceState : interfaces) {
-			interfaceState.onClose();
-			interfaceState.getClosedProperty().setValue(new InterfaceCloseEvent(player, interfaceState));
-		}
 		userInterfaces.remove(player.getUniqueId());
 		player.closeInventory();
 	}
