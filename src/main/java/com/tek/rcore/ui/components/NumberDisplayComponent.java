@@ -20,18 +20,18 @@ public class NumberDisplayComponent extends InterfaceComponent {
 	private int rendered;
 	private int renderedTicker;
 	private DrawOrder order;
-	private WrappedProperty<Integer> value;
+	private WrappedProperty<Long> value;
 	
 	public NumberDisplayComponent(int x, int y, ItemStack[] digits, int length, Direction direction, DrawOrder order) {
 		this(x, y, digits, 0, length, direction, order);
 	}
 	
-	public NumberDisplayComponent(int x, int y, ItemStack[] digits, int defaultValue, int length, Direction direction, DrawOrder order) {
+	public NumberDisplayComponent(int x, int y, ItemStack[] digits, long defaultValue, int length, Direction direction, DrawOrder order) {
 		super(x, y, direction.equals(Direction.HORIZONTAL) ? length : 1, direction.equals(Direction.HORIZONTAL) ? 1 : length);
 		this.direction = direction;
-		this.value = new WrappedProperty<Integer>(defaultValue);
+		this.value = new WrappedProperty<Long>(defaultValue);
 		this.value.addWatcher(i -> {
-			if(i < 0) this.value.setValue(0);
+			if(i < 0) this.value.setValue(0l);
 		});
 		this.rendered = 0;
 		this.digits = digits;
@@ -48,12 +48,12 @@ public class NumberDisplayComponent extends InterfaceComponent {
 		this(x, y, set, 0, length, direction, order);
 	}
 	
-	public NumberDisplayComponent(int x, int y, NumberSet set, int defaultValue, int length, Direction direction, DrawOrder order) {
+	public NumberDisplayComponent(int x, int y, NumberSet set, long defaultValue, int length, Direction direction, DrawOrder order) {
 		super(x, y, direction.equals(Direction.HORIZONTAL) ? length : 1, direction.equals(Direction.HORIZONTAL) ? 1 : length);
 		this.direction = direction;
-		this.value = new WrappedProperty<Integer>(defaultValue);
+		this.value = new WrappedProperty<Long>(defaultValue);
 		this.value.addWatcher(i -> {
-			if(i < 0) this.value.setValue(0);
+			if(i < 0) this.value.setValue(0l);
 		});
 		this.order = order;
 		this.rendered = 0;
@@ -115,7 +115,7 @@ public class NumberDisplayComponent extends InterfaceComponent {
 		}
 	}
 	
-	public WrappedProperty<Integer> getValue() {
+	public WrappedProperty<Long> getValue() {
 		return value;
 	}
 	
