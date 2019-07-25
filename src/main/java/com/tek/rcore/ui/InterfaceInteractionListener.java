@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import com.tek.rcore.RedstoneCore;
 import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.events.InterfaceCloseEvent;
+import com.tek.rcore.ui.events.InterfaceCloseEvent.InterfaceCloseType;
 
 public class InterfaceInteractionListener implements Listener {
 	
@@ -73,8 +75,8 @@ public class InterfaceInteractionListener implements Listener {
 					if(event.getClickedInventory().equals(current.getInventory())) {
 						if(current.canTake(x, y)) {
 							ItemStack slot = event.getCurrentItem().clone();
-							if(getFitAmount((Player)event.getWhoClicked(), slot) < slot.getAmount()) {
-								slot.setAmount(slot.getAmount() - getFitAmount((Player)event.getWhoClicked(), slot));
+							if(InventoryUtils.getItemFitCount((Player)event.getWhoClicked(), slot) < slot.getAmount()) {
+								slot.setAmount(slot.getAmount() - InventoryUtils.getItemFitCount((Player)event.getWhoClicked(), slot));
 							} else {
 								slot.setAmount(0);
 							}
@@ -174,27 +176,29 @@ public class InterfaceInteractionListener implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		Optional<List<InterfaceState>> interfaceStates = instance.getInterfaceStates(event.getPlayer().getUniqueId());
-		if(interfaceStates.isPresent()) {
-			if(interfaceStates.get().get(0).getInventory().equals(event.getInventory())) {
-				interfaceStates.get().get(0).onClose();
-				interfaceStates.get().get(0).getClosedProperty().setValue(new InterfaceCloseEvent((Player)event.getPlayer(), interfaceStates.get().get(0)));
-				instance.removeInterfaceLayer((Player) event.getPlayer());
-			}
-		}
-	}
-	
-	private int getFitAmount(Player p, ItemStack item) {
-		int sum = 0;
-		for(ItemStack slot : p.getInventory().getStorageContents()) {
-			if(slot == null || slot.getType().equals(Material.AIR)) {
-				sum += item.getMaxStackSize();
-				continue;
-			}
-			
-			if(slot.isSimilar(item)) sum += item.getMaxStackSize() - slot.getAmount();
-		}
 		
-		return sum;
+		if(interfaceStates.isPresent()) {
+			InterfaceState state = interfaceStates.get().get(0);
+			if(state.getInventory().equals(event.getInventory())) {
+				if(!state.getCloseType().equals(InterfaceCloseType.IGNORED)) {
+					state.getClosedProperty().setValue(new InterfaceCloseEvent((Player) event.getPlayer(), state.getCloseType(), state));
+					state.setCloseType(InterfaceCloseType.PLAYER);
+					
+					if(!instance.getUserInterfaces().containsKey(event.getPlayer().getUniqueId())) return;
+					instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).remove(0);
+					if(instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).isEmpty()) {
+						instance.getUserInterfaces().remove(event.getPlayer().getUniqueId());
+					} else {
+						InterfaceState newState = instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).get(0);
+						Bukkit.getScheduler().scheduleSyncDelayedTask(RedstoneCore.getInstance(), () -> {
+							newState.show((Player) event.getPlayer());
+						}, 0l);
+					}
+				} else {
+					state.setCloseType(InterfaceCloseType.PLAYER);
+				}
+			}
+		}
 	}
 	
 }

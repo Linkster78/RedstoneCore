@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.events.InterfaceCloseEvent;
+import com.tek.rcore.ui.events.InterfaceCloseEvent.InterfaceCloseType;
 
 public abstract class InterfaceState {
 	
@@ -27,16 +28,17 @@ public abstract class InterfaceState {
 	protected List<InterfaceComponent> components;
 	private ItemStack[][] drawBuffer;
 	private WrappedProperty<InterfaceCloseEvent> closed;
+	private InterfaceCloseType closeType;
 	
 	public InterfaceState(String title, int rows) {
 		this.inventory = Bukkit.createInventory(null, rows * 9, title);
 		this.components = new ArrayList<InterfaceComponent>();
 		this.drawBuffer = new ItemStack[9][rows];
 		this.closed = new WrappedProperty<InterfaceCloseEvent>();
+		this.closeType = InterfaceCloseType.PLAYER;
 	}
 	
 	public abstract void initialize(List<InterfaceComponent> components);
-	public void onClose() { }
 	
 	public void show(Player player) {
 		player.openInventory(inventory);
@@ -150,7 +152,7 @@ public abstract class InterfaceState {
 		}
 	}
 	
-	public ItemStack[][] spliceInventorySection(Map<Integer, ItemStack> changeMap, int x, int y, int width, int height) {
+	private ItemStack[][] spliceInventorySection(Map<Integer, ItemStack> changeMap, int x, int y, int width, int height) {
 		ItemStack[][] spliced = new ItemStack[width][height];
 		for(int x1 = 0; x1 < width; x1++) {
 			for(int y1 = 0; y1 < height; y1++) {
@@ -183,6 +185,14 @@ public abstract class InterfaceState {
 	
 	public Inventory getInventory() {
 		return inventory;
+	}
+	
+	public InterfaceCloseType getCloseType() {
+		return closeType;
+	}
+	
+	public void setCloseType(InterfaceCloseType closeType) {
+		this.closeType = closeType;
 	}
 	
 }

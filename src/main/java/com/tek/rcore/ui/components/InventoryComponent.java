@@ -3,9 +3,9 @@ package com.tek.rcore.ui.components;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.InterfaceComponent;
 import com.tek.rcore.ui.InterfaceState;
 import com.tek.rcore.ui.WrappedProperty;
@@ -44,7 +44,7 @@ public class InventoryComponent extends InterfaceComponent {
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
 				ItemStack item = inventoryContents.getValue()[x][y];
-				if(item != null && (item.getAmount() <= 0 || item.getType().equals(Material.AIR))) {
+				if(item != null && InventoryUtils.isItemEmpty(item)) {
 					inventoryContents.getValue()[x][y] = null;
 					changed = true;
 				}

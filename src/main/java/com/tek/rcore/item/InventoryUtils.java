@@ -199,6 +199,10 @@ public class InventoryUtils {
 		return item;
 	}
 	
+	public static boolean isItemEmpty(ItemStack item) {
+		return item == null || item.getType().equals(Material.AIR) || item.getAmount() <= 0;
+	}
+	
 	public static int getHeight(int size) {
 		return size / ROW_SIZE;
 	}

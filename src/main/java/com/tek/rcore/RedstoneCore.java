@@ -17,6 +17,11 @@ public class RedstoneCore extends JavaPlugin {
 		interfaceManager.register(10);
 	}
 	
+	@Override
+	public void onDisable() {
+		interfaceManager.disable();
+	}
+	
 	public static RedstoneCore getInstance() {
 		return instance;
 	}
