@@ -28,14 +28,33 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.tek.rcore.misc.ReflectionUtils;
 
+/**
+ * A class which makes the creation
+ * of textured player skulls easier.
+ * 
+ * @author RedstoneTek
+ */
 public class SkullFactory {
 	
+	//Mojang API Endpoints
 	private static String USERNAME_ENDPOINT = "https://api.mojang.com/users/profiles/minecraft/%s";
 	private static String PROFILE_ENDPOINT = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
+	//HTTP Request User Agent
 	private static String USER_AGENT = "RedstoneCore/1.0";
+	//The character set used for the random name generation
 	private static String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+	//The list of cached skulls, used to reduce the amount of HTTP requests needed
 	private static List<CachedSkull> cachedSkulls;
 	
+	/**
+	 * Creates the skull of the player
+	 * with the specified name. If the
+	 * player has never logged on, it
+	 * queries the Mojang API for it.
+	 * 
+	 * @param name The player name
+	 * @return The skull itemstack
+	 */
 	public static ItemStack createSkull(String name) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
@@ -70,6 +89,15 @@ public class SkullFactory {
 		return item;
 	}
 	
+	/**
+	 * Creates the skull of the player
+	 * with the specified UUID. If the
+	 * player has never logged on, it
+	 * queries the Mojang API for it.
+	 * 
+	 * @param uuid The player UUID
+	 * @return The skull itemstack
+	 */
 	public static ItemStack createSkull(UUID uuid) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
@@ -101,6 +129,13 @@ public class SkullFactory {
 		return item;
 	}
 	
+	/**
+	 * Creates a skull itemstack
+	 * with the specified game profile.
+	 * 
+	 * @param profile The game profile
+	 * @return The skull itemstack
+	 */
 	public static ItemStack createSkull(GameProfile profile) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
@@ -113,18 +148,45 @@ public class SkullFactory {
 		return item;
 	}
 	
+	/**
+	 * Generates a fake game profile
+	 * with the specified texture value
+	 * and signature.
+	 * 
+	 * @param textureValue The base64 texture value
+	 * @param textureSignature The texture signature from Mojang
+	 * @return A fake game profile
+	 */
 	public static GameProfile getFakeGameProfileFromProperties(String textureValue, String textureSignature) {
 		GameProfile profile = new GameProfile(UUID.randomUUID(), randomName());
 		profile.getProperties().put("textures", new Property("textures", textureValue, textureSignature));
 		return profile;
 	}
 	
+	/**
+	 * Generates a fake game profile
+	 * with the specified texture value.
+	 * 
+	 * @param textureValue The base64 texture value
+	 * @return A fake game profile
+	 */
 	public static GameProfile getFakeGameProfileFromTextureValue(String textureValue) {
 		GameProfile profile = new GameProfile(UUID.randomUUID(), randomName());
 		profile.getProperties().put("textures", new Property("textures", textureValue));
 		return profile;
 	}
 	
+	/**
+	 * Generates a fake game profile
+	 * from the specified skin URL.
+	 * 
+	 * <p>
+	 * Note: The skin URL must be from the Mojang skin servers.
+	 * </p>
+	 * 
+	 * @param url The skin URL
+	 * @return A fake game profile
+	 */
 	public static GameProfile getFakeGameProfileFromMinecraftSkinUrl(String url) {
 		GameProfile profile = new GameProfile(UUID.randomUUID(), randomName());
 		String formattedUrl = String.format("{\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}", url);
@@ -133,12 +195,27 @@ public class SkullFactory {
 		return profile;
 	}
 	
+	/**
+	 * Creates a game profile from
+	 * a cached player skull.
+	 * 
+	 * @param cachedSkull The cached skull
+	 * @return The generated game profile
+	 */
 	public static GameProfile getGameProfile(CachedSkull cachedSkull) {
 		GameProfile profile = new GameProfile(cachedSkull.getUuid(), cachedSkull.getName());
 		profile.getProperties().put("textures", new Property("textures", cachedSkull.getTextureValue(), cachedSkull.getTextureSignature()));
 		return profile;
 	}
 	
+	/**
+	 * Gets the game profile from the
+	 * player with the specified UUID.
+	 * 
+	 * @param uuid The player UUID
+	 * @return The player game profile
+	 * @throws IOException Thrown if an issue arises while sending the HTTP request
+	 */
 	public static GameProfile getGameProfile(UUID uuid) throws IOException {
 		JsonObject sessionProfile = getSessionProfile(uuid);
 		
@@ -172,6 +249,13 @@ public class SkullFactory {
 		}
 	}
 	
+	/**
+	 * Fetches the UUID from a player name.
+	 * 
+	 * @param name The name of the player
+	 * @return The UUID of the player
+	 * @throws IOException Thrown if an issue arises while sending the HTTP request
+	 */
 	public static UUID getUUIDFromName(String name) throws IOException {
 		URL url = new URL(String.format(USERNAME_ENDPOINT, name));
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -208,6 +292,14 @@ public class SkullFactory {
 		}
 	}
 	
+	/**
+	 * Queries the session profile of
+	 * a player from his UUID.
+	 * 
+	 * @param uuid The player UUID
+	 * @return The JSON representation of the session profile
+	 * @throws IOException Thrown if an issue arises while sending the HTTP request
+	 */
 	public static JsonObject getSessionProfile(UUID uuid) throws IOException {
 		URL url = new URL(String.format(PROFILE_ENDPOINT, uuid.toString().replace("-", "")));
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -236,6 +328,12 @@ public class SkullFactory {
 		}
 	}
 	
+	/**
+	 * Generates a randomized 16 character
+	 * name using letters of the alphabet.
+	 * 
+	 * @return A randomized name
+	 */
 	public static String randomName() {
 		String randomized = "";
 		SecureRandom random = new SecureRandom();
@@ -245,25 +343,57 @@ public class SkullFactory {
 		return randomized;
 	}
 	
+	/**
+	 * Returns the cached skull of
+	 * a player if present from the UUID.
+	 * 
+	 * @param uuid The player UUID
+	 * @return The cached skull
+	 */
 	public static Optional<CachedSkull> getCachedSkull(UUID uuid) {
 		return cachedSkulls.stream().filter(cs -> cs.getUuid().equals(uuid)).findFirst();
 	}
 	
+	/**
+	 * Returns the cached skull of
+	 * a player if present from the name.
+	 * 
+	 * @param uuid The player name
+	 * @return The cached skull
+	 */
 	public static Optional<CachedSkull> getCachedSkull(String name) {
 		return cachedSkulls.stream().filter(cs -> cs.getName().equalsIgnoreCase(name)).findFirst();
 	}
 	
+	//Initializes the cached skull array list.
 	static {
 		cachedSkulls = new ArrayList<CachedSkull>();
 	}
 	
+	/**
+	 * A class which holds information
+	 * related to game profiles and skulls.
+	 * 
+	 * @author RedstoneTek
+	 */
 	public static class CachedSkull {
 		
+		//GameProfile & Player variables
 		private UUID uuid;
 		private String name;
 		private String textureValue;
 		private String textureSignature;
 		
+		/**
+		 * Creates a CachedSkull instance from
+		 * the UUID, name, base64 texture value
+		 * and texture signature from Mojang.
+		 * 
+		 * @param uuid The player UUID
+		 * @param name The player name
+		 * @param textureValue The base64 texture value
+		 * @param textureSignature The texture signature
+		 */
 		public CachedSkull(UUID uuid, String name, String textureValue, String textureSignature) {
 			this.uuid = uuid;
 			this.name = name;
@@ -271,24 +401,52 @@ public class SkullFactory {
 			this.textureSignature = textureSignature;
 		}
 
+		/**
+		 * Gets the UUID
+		 * 
+		 * @return The UUID
+		 */
 		public UUID getUuid() {
 			return uuid;
 		}
 
+		/**
+		 * Gets the name
+		 * 
+		 * @return The name
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * Gets the base64 texture value
+		 * 
+		 * @return The texture value
+		 */
 		public String getTextureValue() {
 			return textureValue;
 		}
 
+		/**
+		 * Gets the texture signature
+		 * 
+		 * @return The texture signature
+		 */
 		public String getTextureSignature() {
 			return textureSignature;
 		}
 		
 	}
 	
+	/**
+	 * An enum containing sets of
+	 * numbered skulls of color. Used in
+	 * the {@link NumberDisplayComponent}
+	 * @see NumberDisplayComponent
+	 * 
+	 * @author RedstoneTek
+	 */
 	public static enum NumberSkulls {
 		
 		/*
@@ -473,36 +631,72 @@ public class SkullFactory {
 		BLACK_8(NumberSet.BLACK, 8, "84ad12c2f21a1972f3d2f381ed05a6cc088489fcfdf68a713b387482fe91e2"),
 		BLACK_9(NumberSet.BLACK, 9, "9f7aa0d97983cd67dfb67b7d9d9c641bc9aa34d96632f372d26fee19f71f8b7");
 		
+		//Enum values
 		private NumberSet set;
 		private int number;
 		private String minecraftSkinUrl;
 		
+		/**
+		 * Creates an enum value.
+		 * 
+		 * @param set The set that contains it
+		 * @param number The digit within the set
+		 * @param minecraftSkinUrl The skin url hash
+		 */
 		private NumberSkulls(NumberSet set, int number, String minecraftSkinUrl) {
 			this.set = set;
 			this.number = number;
 			this.minecraftSkinUrl = minecraftSkinUrl;
 		}
 		
+		/**
+		 * Gets the associated NumberSet.
+		 * 
+		 * @return The number set
+		 */
 		public NumberSet getNumberSet() {
 			return set;
 		}
 		
+		/**
+		 * Gets the skull digit.
+		 * 
+		 * @return The digit
+		 */
 		public int getNumber() {
 			return number;
 		}
 		
+		/**
+		 * Gets the game profile from the skull enum.
+		 * 
+		 * @return The game profile
+		 */
 		public GameProfile getGameProfile() {
 			return SkullFactory.getFakeGameProfileFromMinecraftSkinUrl("http://textures.minecraft.net/texture/" + this.minecraftSkinUrl);
 		}
 		
+		/**
+		 * Attempts to find a skull matching the
+		 * NumberSet as well as the digit.
+		 * 
+		 * @param set The number set
+		 * @param number The digit
+		 * @return The skull value
+		 */
 		public static Optional<NumberSkulls> getNumberSkulls(NumberSet set, int number) {
 			return Arrays.stream(NumberSkulls.values()).filter(ns -> ns.getNumberSet().equals(set) && ns.getNumber() == number).findFirst();
 		}
 		
 	}
 	
+	/**
+	 * An enum which holds a list
+	 * of number set colors.
+	 * 
+	 * @author RedstoneTek
+	 */
 	public enum NumberSet {
-		
 		BROWN,
 		CYAN,
 		GRAY,
@@ -519,7 +713,6 @@ public class SkullFactory {
 		BLACK,
 		WHITE,
 		RED;
-		
 	}
 	
 }
