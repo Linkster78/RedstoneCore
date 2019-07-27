@@ -21,8 +21,17 @@ import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.events.InterfaceCloseEvent;
 import com.tek.rcore.ui.events.InterfaceCloseEvent.InterfaceCloseType;
 
+/**
+ * A class template for interface
+ * states. Interface States are
+ * basically one "window" or one
+ * "State" of your application.
+ * 
+ * @author RedstoneTek
+ */
 public abstract class InterfaceState {
 	
+	//The internal interface state values.
 	private UUID uuid;
 	private Inventory inventory;
 	protected List<InterfaceComponent> components;
@@ -30,6 +39,13 @@ public abstract class InterfaceState {
 	private WrappedProperty<InterfaceCloseEvent> closed;
 	private InterfaceCloseType closeType;
 	
+	/**
+	 * Creates an InterfaceState with
+	 * the specified title and row count.
+	 * 
+	 * @param title The inventory title
+	 * @param rows The inventory row count/height
+	 */
 	public InterfaceState(String title, int rows) {
 		this.inventory = Bukkit.createInventory(null, rows * 9, title);
 		this.components = new ArrayList<InterfaceComponent>();
@@ -38,12 +54,31 @@ public abstract class InterfaceState {
 		this.closeType = InterfaceCloseType.PLAYER;
 	}
 	
+	/**
+	 * Initializes the Interface State.
+	 * All components must be registered here.
+	 * <p>NOTE: Components added later will be rendered above the earlier components.
+	 * As such, you could have a large pane in the back, with components in the front.</p>
+	 * 
+	 * @param components The component list in which to add components.
+	 */
 	public abstract void initialize(List<InterfaceComponent> components);
 	
+	/**
+	 * Displays the interface state to the player.
+	 * 
+	 * @param player The player
+	 */
 	public void show(Player player) {
 		player.openInventory(inventory);
 	}
 	
+	/**
+	 * Initializes and opens the interface
+	 * state to the player.
+	 * 
+	 * @param player The player
+	 */
 	public void open(Player player) {
 		initialize(components);
 		tick();
@@ -51,12 +86,19 @@ public abstract class InterfaceState {
 		show(player);
 	}
 	
+	/**
+	 * Called every so often, updates the values
+	 * of the interface components.
+	 */
 	public void tick() {
 		for(InterfaceComponent component : components) {
 			component.tick(this);
 		}
 	}
 	
+	/**
+	 * Clears the rendering draw buffer.
+	 */
 	private void clearBuffer() {
 		for(int x = 0; x < 9; x++) {
 			for(int y = 0; y < inventory.getSize() / 9; y++) {
@@ -65,6 +107,9 @@ public abstract class InterfaceState {
 		}
 	}
 	
+	/**
+	 * Transfers the draw buffer to the inventory.
+	 */
 	private void drawBuffer() {
 		for(int x = 0; x < 9; x++) {
 			for(int y = 0; y < inventory.getSize() / 9; y++) {
@@ -73,6 +118,10 @@ public abstract class InterfaceState {
 		}
 	}
 	
+	/**
+	 * Clears the buffer, renders every component
+	 * and then transfers the draw buffer onto the inventory.
+	 */
 	public void render() {
 		clearBuffer();
 		for(InterfaceComponent component : components) {
@@ -81,6 +130,15 @@ public abstract class InterfaceState {
 		drawBuffer();
 	}
 	
+	/**
+	 * Called when the player clicks on the interface.
+	 * The click is then transferred to components that apply.
+	 * 
+	 * @param type The ClickType
+	 * @param item The item on the cursor
+	 * @param x The X position from the left (Starts at 0)
+	 * @param y The Y position from the top (Starts at 0)
+	 */
 	public void onClick(ClickType type, ItemStack item, int x, int y) {
 		if(y >= inventory.getSize() / 9) return;
 		for(InterfaceComponent component : components) {
@@ -92,17 +150,30 @@ public abstract class InterfaceState {
 		}
 	}
 	
+	/**
+	 * Called when the player adds/takes an item from the interface.
+	 * The change is then transferred to components that apply.
+	 * 
+	 * @param slot The slot which had a change
+	 * @param item The item in the slot
+	 */
 	public void onChange(int slot, ItemStack item) {
 		Map<Integer, ItemStack> changeMap = new HashMap<Integer, ItemStack>();
 		changeMap.put(slot, item);
 		onChange(changeMap);
 	}
 	
+	/**
+	 * Called when the player adds/takes multiple items from the interface.
+	 * The changes are then transferred to components that apply.
+	 * 
+	 * @param newItems The item change map
+	 */
 	public void onChange(Map<Integer, ItemStack> newItems) {
 		Iterator<Entry<Integer, ItemStack>> itemIterator = newItems.entrySet().iterator();
 		while(itemIterator.hasNext()) {
 			Entry<Integer, ItemStack> entry = itemIterator.next();
-			if(InventoryUtils.slotToY(entry.getKey()) >= inventory.getSize() / 9) {
+			if(InventoryUtils.slotToY(entry.getKey()) >= InventoryUtils.getHeight(inventory.getSize())) {
 				itemIterator.remove();
 			}
 		}
@@ -118,8 +189,16 @@ public abstract class InterfaceState {
 				});
 	}
 	
+	/**
+	 * Checks whether the player can take the item
+	 * at the specified X and Y coordinate.
+	 * 
+	 * @param x The X coordinate from the left (Starts at 0)
+	 * @param y The Y coordinate from the top (Start at 0)
+	 * @return Whether the player can take the item
+	 */
 	public boolean canTake(int x, int y) {
-		if(y >= inventory.getSize() / 9) return true;
+		if(y >= InventoryUtils.getHeight(inventory.getSize())) return true;
 		
 		//Reverse to get components in render order (first is the last to render, so the top one)
 		Collections.reverse(components);
@@ -135,8 +214,16 @@ public abstract class InterfaceState {
 		}
 	}
 	
+	/**
+	 * Checks whether the player can add the item
+	 * at the specified X and Y coordinate.
+	 * 
+	 * @param x The X coordinate from the left (Starts at 0)
+	 * @param y The Y coordinate from the top (Start at 0)
+	 * @return Whether the player can add the item
+	 */
 	public boolean canAdd(int x, int y) {
-		if(y >= inventory.getSize() / 9) return true;
+		if(y >= InventoryUtils.getHeight(inventory.getSize())) return true;
 		
 		//Reverse to get components in render order (first is the last to render, so the top one)
 		Collections.reverse(components);
@@ -152,6 +239,17 @@ public abstract class InterfaceState {
 		}
 	}
 	
+	/**
+	 * Splices a part of the inventory and
+	 * applies the changes of the change map.
+	 * 
+	 * @param changeMap The change map
+	 * @param x The X coordinate from the left (Starts at 0)
+	 * @param y The Y coordinate from the top (Starts at 0)
+	 * @param width The width of the area
+	 * @param height The height of the area
+	 * @return The spliced inventory section
+	 */
 	private ItemStack[][] spliceInventorySection(Map<Integer, ItemStack> changeMap, int x, int y, int width, int height) {
 		ItemStack[][] spliced = new ItemStack[width][height];
 		for(int x1 = 0; x1 < width; x1++) {
@@ -167,30 +265,67 @@ public abstract class InterfaceState {
 		return spliced;
 	}
 	
+	/**
+	 * Returns the closed property.
+	 * <p>NOTE: To add a close watcher, use this property.</p>
+	 * 
+	 * @return The closed property
+	 */
 	public WrappedProperty<InterfaceCloseEvent> getClosedProperty() {
 		return closed;
 	}
 	
+	/**
+	 * Sets the viewer's UUID.
+	 * 
+	 * @param uuid The viewer's UUID
+	 */
 	public void setUUID(UUID uuid) {
 		this.uuid = uuid;
 	}
 	
+	/**
+	 * Returns the UUID of the viewer.
+	 * 
+	 * @return The viewer UUID
+	 */
 	public UUID getUUID() {
 		return uuid;
 	}
 	
+	/**
+	 * Returns the player associated with the UUID.
+	 * 
+	 * @return The player/owner
+	 */
 	public Player getOwner() {
 		return Bukkit.getPlayer(uuid);
 	}
 	
+	/**
+	 * Returns the inventory behind
+	 * the interface state.
+	 * 
+	 * @return The inventory
+	 */
 	public Inventory getInventory() {
 		return inventory;
 	}
 	
+	/**
+	 * Returns the next close event's close type.
+	 * 
+	 * @return The next close event's close type
+	 */
 	public InterfaceCloseType getCloseType() {
 		return closeType;
 	}
 	
+	/**
+	 * Sets the next close event's close type.
+	 * 
+	 * @param closeType The next close event's close type
+	 */
 	public void setCloseType(InterfaceCloseType closeType) {
 		this.closeType = closeType;
 	}

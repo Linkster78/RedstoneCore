@@ -42,14 +42,35 @@ import com.tek.rcore.item.InventoryUtils;
 import com.tek.rcore.ui.events.InterfaceCloseEvent;
 import com.tek.rcore.ui.events.InterfaceCloseEvent.InterfaceCloseType;
 
+/**
+ * A class which handles inventory
+ * events and passes them to the
+ * correct interface state.
+ * 
+ * @author RedstoneTek
+ */
 public class InterfaceInteractionListener implements Listener {
 	
+	//The InterfaceManager instance.
 	private InterfaceManager instance;
 	
+	/**
+	 * Creates the interaction listener
+	 * with the provided interface manager.
+	 * 
+	 * @param instance The interface manager
+	 */
 	public InterfaceInteractionListener(InterfaceManager instance) {
 		this.instance = instance;
 	}
 	
+	/**
+	 * Handles the InventoryClickEvent
+	 * and passes it to the player interface
+	 * if there is one registered.
+	 * 
+	 * @param event The InventoryClickEvent
+	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
 		InventoryAction a = event.getAction();
@@ -131,6 +152,13 @@ public class InterfaceInteractionListener implements Listener {
 		}
 	}
 	
+	/**
+	 * Handles the InventoryDragEvent
+	 * and passes it to the player interface
+	 * if there is one registered.
+	 * 
+	 * @param event The InventoryDragEvent
+	 */
 	@EventHandler
 	public void onInventoryDrag(InventoryDragEvent event) {
 		Optional<List<InterfaceState>> interfaceStates = instance.getInterfaceStates(event.getWhoClicked().getUniqueId());
@@ -173,6 +201,13 @@ public class InterfaceInteractionListener implements Listener {
 		}
 	}
 	
+	/**
+	 * Handles the InventoryCloseEvent
+	 * and passes it to the player interface
+	 * if there is one registered.
+	 * 
+	 * @param event The InventoryCoseEvent
+	 */
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		Optional<List<InterfaceState>> interfaceStates = instance.getInterfaceStates(event.getPlayer().getUniqueId());
