@@ -1,1 +1,11 @@
-# Documentation coming soon enough.
+# RedstoneCore
+
+## Description
+
+## Usage
+
+## Contributing
+
+## Credits
+
+## License
