@@ -124,12 +124,30 @@ public class InterfaceComponent {
 	}
 	
 	/**
+	 * Sets the component's X position.
+	 * 
+	 * @param x The X position from the left (Starts at 0)
+	 */
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	/**
 	 * Returns the component's X position.
 	 * 
 	 * @return The X position from the left (Starts at 0)
 	 */
 	public int getX() {
 		return x;
+	}
+	
+	/**
+	 * Sets the component's Y position.
+	 * 
+	 * @param y The Y position from the top (Starts at 0)
+	 */
+	public void setY(int y) {
+		this.y = y;
 	}
 	
 	/**
