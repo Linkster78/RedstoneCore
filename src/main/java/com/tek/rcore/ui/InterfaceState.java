@@ -81,9 +81,9 @@ public abstract class InterfaceState {
 	 */
 	public void open(Player player) {
 		initialize(components);
+		show(player);
 		tick();
 		render();
-		show(player);
 	}
 	
 	/**
