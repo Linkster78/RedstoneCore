@@ -33,7 +33,7 @@ public class PaginatedComponent extends InterfaceComponent {
 	 */
 	public PaginatedComponent(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		this.pageIndex = new WrappedProperty<Integer>();
+		this.pageIndex = new WrappedProperty<Integer>(0);
 		this.components = new ArrayList<InterfaceComponent>();
 	}
 	
@@ -70,7 +70,7 @@ public class PaginatedComponent extends InterfaceComponent {
 	@Override
 	public void tick(InterfaceState interfaceState) {
 		int pageSize = width * height;
-		int pageCount = (int) Math.ceil((double) components.size() / (double) pageSize);
+		int pageCount = Math.max(1, (int) Math.ceil((double) components.size() / (double) pageSize));
 		if(pageIndex.getValue() < 0) pageIndex.setValue(0);
 		if(pageIndex.getValue() >= pageCount) pageIndex.setValue(pageCount - 1);
 		
@@ -95,6 +95,7 @@ public class PaginatedComponent extends InterfaceComponent {
 		for(int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
 				int index = y * height + x;
+				if(index >= components.size()) break;
 				InterfaceComponent component = components.get(startIndex + index);
 				component.setX(this.x + x);
 				component.setY(this.y + y);
