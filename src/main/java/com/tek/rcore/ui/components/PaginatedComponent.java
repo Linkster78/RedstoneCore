@@ -1,5 +1,6 @@
 package com.tek.rcore.ui.components;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.event.inventory.ClickType;
@@ -32,6 +33,8 @@ public class PaginatedComponent extends InterfaceComponent {
 	 */
 	public PaginatedComponent(int x, int y, int width, int height) {
 		super(x, y, width, height);
+		this.pageIndex = new WrappedProperty<Integer>();
+		this.components = new ArrayList<InterfaceComponent>();
 	}
 	
 	/**
