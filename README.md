@@ -28,9 +28,9 @@ Add the [JitPack](https://jitpack.io/) repository to your pom.xml
 and add the RedstoneCore dependency to your dependencies
 ```
 <dependency>
-  <groupId>com.tek</groupId>
-  <artifactId>rcore</artifactId>
-  <version>VERSION TAG</version>
+  <groupId>com.github.RedstoneTek</groupId>
+  <artifactId>RedstoneCore</artifactId>
+  <version>Tag</version>
 </dependency>
 ```
 
