@@ -13,8 +13,16 @@ import com.tek.rcore.ui.InterfaceState;
 import com.tek.rcore.ui.WrappedProperty;
 import com.tek.rcore.ui.components.SliderComponent.Direction;
 
+/**
+ * A component which displays a
+ * numerical value with the help
+ * of custom skulls.
+ * 
+ * @author RedstoneTek
+ */
 public class NumberDisplayComponent extends InterfaceComponent {
 
+	//The internal NumberDisplay values
 	private Direction direction;
 	private ItemStack[] digits;
 	private int rendered;
@@ -22,10 +30,31 @@ public class NumberDisplayComponent extends InterfaceComponent {
 	private DrawOrder order;
 	private WrappedProperty<Long> value;
 	
+	/**
+	 * Creates a number display with the specified values.
+	 * 
+	 * @param x The X position from the left (Starts at 0)
+	 * @param y The Y position from the top (Starts at 0)
+	 * @param digits The digit array (Contains items representing each digit 0-9)
+	 * @param length The display length
+	 * @param direction The direction
+	 * @param order The display order
+	 */
 	public NumberDisplayComponent(int x, int y, ItemStack[] digits, int length, Direction direction, DrawOrder order) {
 		this(x, y, digits, 0, length, direction, order);
 	}
 	
+	/**
+	 * Creates a number display with the specified values.
+	 * 
+	 * @param x The X position from the left (Starts at 0)
+	 * @param y The Y position from the top (Starts at 0)
+	 * @param digits The digit array (Contains items representing each digit 0-9)
+	 * @param defaultValue The default value of the display
+	 * @param length The display length
+	 * @param direction The direction
+	 * @param order The display order
+	 */
 	public NumberDisplayComponent(int x, int y, ItemStack[] digits, long defaultValue, int length, Direction direction, DrawOrder order) {
 		super(x, y, direction.equals(Direction.HORIZONTAL) ? length : 1, direction.equals(Direction.HORIZONTAL) ? 1 : length);
 		this.direction = direction;
@@ -44,10 +73,31 @@ public class NumberDisplayComponent extends InterfaceComponent {
 		}
 	}
 	
+	/**
+	 * Creates a number display with the specified values.
+	 * 
+	 * @param x The X position from the left (Starts at 0)
+	 * @param y The Y position from the top (Starts at 0)
+	 * @param set The number set to use
+	 * @param length The display length
+	 * @param direction The direction
+	 * @param order The display order
+	 */
 	public NumberDisplayComponent(int x, int y, NumberSet set, int length, Direction direction, DrawOrder order) {
 		this(x, y, set, 0, length, direction, order);
 	}
 	
+	/**
+	 * Creates a number display with the specified values.
+	 * 
+	 * @param x The X position from the left (Starts at 0)
+	 * @param y The Y position from the top (Starts at 0)
+	 * @param set The number set to use
+	 * @param defaultValue The default value of the display
+	 * @param length The display length
+	 * @param direction The direction
+	 * @param order The display order
+	 */
 	public NumberDisplayComponent(int x, int y, NumberSet set, long defaultValue, int length, Direction direction, DrawOrder order) {
 		super(x, y, direction.equals(Direction.HORIZONTAL) ? length : 1, direction.equals(Direction.HORIZONTAL) ? 1 : length);
 		this.direction = direction;
@@ -67,6 +117,10 @@ public class NumberDisplayComponent extends InterfaceComponent {
 		}
 	}
 	
+	/**
+	 * Displays the number component onto
+	 * the interface draw buffer.
+	 */
 	@Override
 	public void render(InterfaceState interfaceState, ItemStack[][] drawBuffer) {
 		if(rendered < digits.length) {
@@ -115,10 +169,21 @@ public class NumberDisplayComponent extends InterfaceComponent {
 		}
 	}
 	
+	/**
+	 * Returns the value.
+	 * 
+	 * @return The value
+	 */
 	public WrappedProperty<Long> getValue() {
 		return value;
 	}
 	
+	/**
+	 * An enum representing the drawing
+	 * order of the display.
+	 * 
+	 * @author RedstoneTek
+	 */
 	public enum DrawOrder {
 		START_FIRST,
 		START_LAST;
