@@ -12,7 +12,7 @@ import com.tek.rcore.ui.WrappedProperty;
 
 /**
  * A component which holds other
- * components and paginates them.
+ * items and paginates them.
  * 
  * @author RedstoneTek
  */
@@ -20,7 +20,7 @@ public class PaginatedComponent extends InterfaceComponent {
 
 	//Paginated component internal values
 	private WrappedProperty<Integer> pageIndex;
-	private List<InterfaceComponent> components;
+	private List<IPaginatedItem> items;
 	
 	/**
 	 * Creates a paginated component at the specified
@@ -34,34 +34,33 @@ public class PaginatedComponent extends InterfaceComponent {
 	public PaginatedComponent(int x, int y, int width, int height) {
 		super(x, y, width, height);
 		this.pageIndex = new WrappedProperty<Integer>(0);
-		this.components = new ArrayList<InterfaceComponent>();
+		this.items = new ArrayList<IPaginatedItem>();
 	}
 	
 	/**
 	 * Clears the inner components.
 	 */
-	public void clearComponents() {
+	public void clearItems() {
 		pageIndex.setValue(0);
-		components.clear();
+		items.clear();
 	}
 	
 	/**
-	 * Removes a component from the pages.
+	 * Removes an item from the pages.
 	 * 
-	 * @param component The component
+	 * @param item The item
 	 */
-	public void removeComponent(InterfaceComponent component) {
-		components.remove(component);
+	public void removeItem(IPaginatedItem item) {
+		items.remove(item);
 	}
 	
 	/**
-	 * Adds a component to the pages.
+	 * Adds an item to the pages.
 	 * 
-	 * @param component The component
+	 * @param item The item
 	 */
-	public void addComponent(InterfaceComponent component) {
-		if(component.getWidth() != 1 || component.getHeight() != 1) throw new IllegalArgumentException("Components must have a width and height of 1.");
-		components.add(component);
+	public void addItem(IPaginatedItem item) {
+		items.add(item);
 	}
 	
 	/**
@@ -70,51 +69,44 @@ public class PaginatedComponent extends InterfaceComponent {
 	@Override
 	public void tick(InterfaceState interfaceState) {
 		int pageSize = width * height;
-		int pageCount = Math.max(1, (int) Math.ceil((double) components.size() / (double) pageSize));
+		int pageCount = Math.max(1, (int) Math.ceil((double) items.size() / (double) pageSize));
 		if(pageIndex.getValue() < 0) pageIndex.setValue(0);
 		if(pageIndex.getValue() >= pageCount) pageIndex.setValue(pageCount - 1);
 		
-		for(InterfaceComponent component : components) {
-			component.tick(interfaceState);
+		for(IPaginatedItem item : items) {
+			item.tick(interfaceState);
 		}
 	}
 	
 	/**
-	 * Renders the inner components and updates positions.
+	 * Renders the items and updates positions.
 	 */
 	@Override
 	public void render(InterfaceState interfaceState, ItemStack[][] drawBuffer) {
 		int pageSize = width * height;
 		int startIndex = pageIndex.getValue() * pageSize;
 		
-		for(InterfaceComponent component : components) {
-			component.setX(-1);
-			component.setY(-1);
-		}
-		
 		for(int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
 				int index = y * height + x;
-				if(index >= components.size()) break;
-				InterfaceComponent component = components.get(startIndex + index);
-				component.setX(this.x + x);
-				component.setY(this.y + y);
-				component.render(interfaceState, drawBuffer);
+				if(index >= items.size()) break;
+				IPaginatedItem item = items.get(startIndex + index);
+				drawBuffer[this.x + x][this.y + y] = item.render(interfaceState);
 			}
 		}
 	}
 	
 	/**
-	 * Transmits the click event to the inner components.
+	 * Transmits the click event to the items.
 	 */
 	@Override
-	public void onClick(InterfaceState interfaceState, ClickType type, ItemStack item, int x, int y) {
-		for(InterfaceComponent component : components) {
-			if(component.collides(x, y)) {
-				if(component.isEditable()) {
-					component.onClick(interfaceState, type, item, x - component.getX(), y - component.getY());
-				}
-			}
+	public void onClick(InterfaceState interfaceState, ClickType type, ItemStack cursor, int x, int y) {
+		int pageSize = width * height;
+		int startIndex = pageIndex.getValue() * pageSize;
+		int index = y * width + x;
+		if(startIndex + index < items.size()) {
+			IPaginatedItem item = items.get(index + startIndex);
+			item.click(interfaceState, type, cursor);
 		}
 	}
 	
@@ -151,12 +143,12 @@ public class PaginatedComponent extends InterfaceComponent {
 	}
 	
 	/**
-	 * Gets the component list.
+	 * Gets the item list.
 	 * 
-	 * @return The component list
+	 * @return The item list
 	 */
-	public List<InterfaceComponent> getItems() {
-		return components;
+	public List<IPaginatedItem> getItems() {
+		return items;
 	}
 
 }
