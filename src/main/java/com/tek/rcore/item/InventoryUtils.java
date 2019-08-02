@@ -1,6 +1,7 @@
 package com.tek.rcore.item;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -383,6 +384,36 @@ public class InventoryUtils {
 	 */
 	public static int getHeight(int size) {
 		return size / ROW_SIZE;
+	}
+	
+	/**
+	 * Renames an itemstack.
+	 * 
+	 * @param item The item
+	 * @param name The displayed name
+	 * @return The renamed item
+	 */
+	public static ItemStack renameItem(ItemStack item, String name) {
+		ItemStack stack = item.clone();
+		ItemMeta meta = stack.getItemMeta();
+		meta.setDisplayName(name);
+		stack.setItemMeta(meta);
+		return stack;
+	}
+	
+	/**
+	 * Changes the lore of an itemstack.
+	 * 
+	 * @param item The item
+	 * @param lore The lore
+	 * @return The re-lored item
+	 */
+	public static ItemStack changeLore(ItemStack item, List<String> lore) {
+		ItemStack stack = item.clone();
+		ItemMeta meta = stack.getItemMeta();
+		meta.setLore(lore);
+		stack.setItemMeta(meta);
+		return stack;
 	}
 	
 }
