@@ -12,6 +12,7 @@ import com.tek.rcore.ui.WrappedProperty;
  * 
  * @author RedstoneTek
  */
+@Deprecated
 public class CanvasComponent extends InterfaceComponent {
 
 	//The internal draw buffer
