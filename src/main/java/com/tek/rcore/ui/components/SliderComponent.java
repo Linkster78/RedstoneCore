@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.tek.rcore.misc.NumberUtils;
 import com.tek.rcore.misc.TextFormatter;
 import com.tek.rcore.ui.InterfaceComponent;
 import com.tek.rcore.ui.InterfaceState;
@@ -23,11 +24,13 @@ import com.tek.rcore.ui.WrappedProperty;
 public class SliderComponent extends InterfaceComponent {
 
 	//The internal slider properties
-	private int length, minimum, maximum;
+	private int length;
+	private double minimum, maximum;
 	private Direction direction;
 	private Material reached, notReached;
-	private WrappedProperty<Integer> value;
+	private WrappedProperty<Double> value;
 	private List<ItemStack> rendered;
+	private String pattern;
 	
 	/**
 	 * Creates a slider with the specified values.
@@ -41,7 +44,7 @@ public class SliderComponent extends InterfaceComponent {
 	 * @param reached The item rendered when the value is reached
 	 * @param notReached The item rendered when the value is not reached
 	 */
-	public SliderComponent(int x, int y, int length, Direction direction, int minimum, int maximum, Material reached, Material notReached) {
+	public SliderComponent(int x, int y, int length, Direction direction, double minimum, double maximum, Material reached, Material notReached) {
 		this(x, y, length, direction, minimum, maximum, minimum, reached, notReached);
 	}
 	
@@ -58,7 +61,7 @@ public class SliderComponent extends InterfaceComponent {
 	 * @param reached The item rendered when the value is reached
 	 * @param notReached The item rendered when the value is not reached
 	 */
-	public SliderComponent(int x, int y, int length, Direction direction, int minimum, int maximum, int defaultValue, Material reached, Material notReached) {
+	public SliderComponent(int x, int y, int length, Direction direction, double minimum, double maximum, double defaultValue, Material reached, Material notReached) {
 		super(x, y, direction.equals(Direction.HORIZONTAL) ? length : 1, direction.equals(Direction.HORIZONTAL) ? 1 : length);
 		this.length = length;
 		this.minimum = minimum;
@@ -66,8 +69,9 @@ public class SliderComponent extends InterfaceComponent {
 		this.direction = direction;
 		this.reached = reached;
 		this.notReached = notReached;
-		this.value = new WrappedProperty<Integer>(defaultValue);
+		this.value = new WrappedProperty<Double>(defaultValue);
 		this.rendered = new ArrayList<ItemStack>();
+		this.pattern = "%f";
 		for(int i = 0; i < length; i++) {
 			rendered.add(new ItemStack(notReached));
 		}
@@ -84,10 +88,10 @@ public class SliderComponent extends InterfaceComponent {
 			for(int y = 0; y < height; y++) {
 				int index = x * height + y;
 				ItemStack item = rendered.get(index);
-				int value = (int)(increment * (double)index) + minimum;
+				double value = NumberUtils.round(increment * (double)index + minimum, (short) 2);
 				item.setType(value <= this.value.getValue() ? reached : notReached);
 				ItemMeta itemMeta = item.getItemMeta();
-				itemMeta.setDisplayName(value <= this.value.getValue() ? TextFormatter.color("&a" + value) : TextFormatter.color("&c" + value));
+				itemMeta.setDisplayName(value <= this.value.getValue() ? TextFormatter.color("&a" + String.format(pattern, value)) : TextFormatter.color("&c" + String.format(pattern, value)));
 				item.setItemMeta(itemMeta);
 				drawBuffer[this.x + x][this.y + y] = item;
 			}
@@ -102,10 +106,10 @@ public class SliderComponent extends InterfaceComponent {
 	public void onClick(InterfaceState interfaceState, ClickType type, ItemStack item, int x, int y) {
 		double increment = ((double)maximum - (double)minimum) / (double)(length - 1);
 		if(direction.equals(Direction.HORIZONTAL)) {
-			int value = (int)(increment * (double)x) + minimum;
+			double value = NumberUtils.round(increment * (double)x + minimum, (short) 2);
 			if(this.value.getValue() != value) this.value.setValue(value);
 		} else {
-			int value = (int)(increment * (double)y) + minimum;
+			double value = NumberUtils.round(increment * (double)y + minimum, (short) 2);
 			if(this.value.getValue() != value) this.value.setValue(value);
 		}
 	}
@@ -115,8 +119,26 @@ public class SliderComponent extends InterfaceComponent {
 	 * 
 	 * @return The value
 	 */
-	public WrappedProperty<Integer> getValue() {
+	public WrappedProperty<Double> getValue() {
 		return value;
+	}
+	
+	/**
+	 * Gets the number pattern.
+	 * 
+	 * @return The pattern
+	 */
+	public String getPattern() {
+		return pattern;
+	}
+	
+	/**
+	 * Sets the pattern to use when displaying the numbers.
+	 * 
+	 * @param pattern The pattern
+	 */
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.tek.rcore.misc.NumberUtils;
 import com.tek.rcore.misc.TextFormatter;
 
 /**
@@ -360,7 +361,7 @@ public class InventoryUtils {
 			Enchantment enchantment = enchantmentIterator.next();
 			int level = hidden.getEnchantmentLevel(enchantment);
 			enchantmentIterator.remove();
-			meta.getLore().add(0, TextFormatter.color("&7" + TextFormatter.capitalize(enchantment.getKey().getKey()) + " " + TextFormatter.enchantmentLevelToRoman(level)));
+			meta.getLore().add(0, TextFormatter.color("&7" + TextFormatter.capitalize(enchantment.getKey().getKey()) + " " + NumberUtils.enchantmentLevelToRoman(level)));
 		}
 		hidden.setItemMeta(meta);
 		return item;
