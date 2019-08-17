@@ -27,6 +27,8 @@ public class InterfaceManager {
 	private Plugin instance;
 	//The Map containing all the open interfaces.
 	private Map<UUID, List<InterfaceState>> userInterfaces;
+	//The Refresh Rate (Hz) of the interfaces/
+	private double refreshRate;
 	
 	/**
 	 * Creates an InterfaceManager instance
@@ -45,9 +47,9 @@ public class InterfaceManager {
 	 * 
 	 * @param hz The tick/render frequency per seconds
 	 */
-	public void register(double hz) {
+	public void register(double refreshRate) {
 		instance.getServer().getPluginManager().registerEvents(new InterfaceInteractionListener(this), instance);
-		int tickInterval = (int)Math.ceil(20d / hz);
+		int tickInterval = (int)Math.ceil(20d / refreshRate);
 		instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, new InterfaceUpdater(this), 0, tickInterval);
 	}
 	
@@ -68,7 +70,7 @@ public class InterfaceManager {
 		}
 		
 		interfaceState.setUUID(player.getUniqueId());
-		interfaceState.open(player);
+		interfaceState.open();
 	}
 	
 	/**
@@ -81,7 +83,7 @@ public class InterfaceManager {
 	public void switchInterface(Player player, InterfaceState interfaceState) {
 		if(!userInterfaces.containsKey(player.getUniqueId())) return;
 		userInterfaces.get(player.getUniqueId()).get(0).setCloseType(InterfaceCloseType.PROGRAMMATICAL);
-		player.closeInventory();
+		userInterfaces.get(player.getUniqueId()).get(0).close();
 		openInterface(player, interfaceState);
 	}
 	
@@ -94,7 +96,7 @@ public class InterfaceManager {
 	public void closeLayer(Player player) {
 		if(!userInterfaces.containsKey(player.getUniqueId())) return;
 		userInterfaces.get(player.getUniqueId()).get(0).setCloseType(InterfaceCloseType.PROGRAMMATICAL);
-		player.closeInventory();
+		userInterfaces.get(player.getUniqueId()).get(0).close();
 	}
 	
 	/**
@@ -107,7 +109,7 @@ public class InterfaceManager {
 		if(!userInterfaces.containsKey(player.getUniqueId())) return;
 		List<InterfaceState> states = userInterfaces.get(player.getUniqueId());
 		userInterfaces.remove(player.getUniqueId());
-		player.closeInventory();
+		userInterfaces.get(player.getUniqueId()).get(0).close();
 		for(int i = states.size() - 1; i >= 0; i--) {
 			InterfaceState state = states.get(i);
 			state.getClosedProperty().setValue(new InterfaceCloseEvent(player, InterfaceCloseType.PROGRAMMATICAL, state));
@@ -143,6 +145,24 @@ public class InterfaceManager {
 	 */
 	public Map<UUID, List<InterfaceState>> getUserInterfaces() {
 		return userInterfaces;
+	}
+	
+	/**
+	 * Returns the interval at which interfaces are ticked and rendered.
+	 * 
+	 * @return The tick interval
+	 */
+	public int getTickInterval() {
+		return (int) Math.ceil(20d / refreshRate);
+	}
+	
+	/**
+	 * Returns the refresh rate of the interfaces.
+	 * 
+	 * @return The refresh rate
+	 */
+	public double getRefreshRate() {
+		return refreshRate;
 	}
 	
 }

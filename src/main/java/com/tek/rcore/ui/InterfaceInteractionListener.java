@@ -226,7 +226,7 @@ public class InterfaceInteractionListener implements Listener {
 					} else {
 						InterfaceState newState = instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).get(0);
 						Bukkit.getScheduler().scheduleSyncDelayedTask(RedstoneCore.getInstance(), () -> {
-							newState.show((Player) event.getPlayer());
+							newState.show();
 						}, 0l);
 					}
 				} else {

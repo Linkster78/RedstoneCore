@@ -26,7 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.tek.rcore.misc.ReflectionUtils;
+import com.tek.rcore.nms.ReflectionUtils;
 
 /**
  * A class which makes the creation
@@ -60,11 +60,7 @@ public class SkullFactory {
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
 		Optional<CachedSkull> cachedSkullOpt = getCachedSkull(name);
 		if(cachedSkullOpt.isPresent()) {
-			try {
-				ReflectionUtils.applyProfile(skull, getGameProfile(cachedSkullOpt.get()));
-			} catch (ReflectiveOperationException e) {
-				e.printStackTrace();
-			}
+			ReflectionUtils.applyProfile(skull, getGameProfile(cachedSkullOpt.get()));
 			item.setItemMeta(skull);
 		} else {
 			OfflinePlayer player = Bukkit.getPlayer(name);
@@ -80,7 +76,7 @@ public class SkullFactory {
 							ReflectionUtils.applyProfile(skull, profile);
 						}
 					}
-				} catch(ReflectiveOperationException | IOException e) {
+				} catch(IOException e) {
 					e.printStackTrace();
 				}
 				item.setItemMeta(skull);
@@ -103,11 +99,7 @@ public class SkullFactory {
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
 		Optional<CachedSkull> cachedSkullOpt = getCachedSkull(uuid);
 		if(cachedSkullOpt.isPresent()) {
-			try {
-				ReflectionUtils.applyProfile(skull, getGameProfile(cachedSkullOpt.get()));
-			} catch (ReflectiveOperationException e) {
-				e.printStackTrace();
-			}
+			ReflectionUtils.applyProfile(skull, getGameProfile(cachedSkullOpt.get()));
 			item.setItemMeta(skull);
 		} else {
 			OfflinePlayer player = Bukkit.getPlayer(uuid);
@@ -120,7 +112,7 @@ public class SkullFactory {
 					if(profile != null) {
 						ReflectionUtils.applyProfile(skull, profile);
 					}
-				} catch(ReflectiveOperationException | IOException e) {
+				} catch(IOException e) {
 					e.printStackTrace();
 				}
 				item.setItemMeta(skull);
@@ -139,11 +131,7 @@ public class SkullFactory {
 	public static ItemStack createSkull(GameProfile profile) {
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta skull = (SkullMeta) item.getItemMeta();
-		try {
-			ReflectionUtils.applyProfile(skull, profile);
-		} catch(ReflectiveOperationException e) {
-			e.printStackTrace();
-		}
+		ReflectionUtils.applyProfile(skull, profile);
 		item.setItemMeta(skull);
 		return item;
 	}

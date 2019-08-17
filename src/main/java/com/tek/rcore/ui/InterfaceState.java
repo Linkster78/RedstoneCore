@@ -40,6 +40,14 @@ public abstract class InterfaceState {
 	private InterfaceCloseType closeType;
 	
 	/**
+	 * Creates an unconventional interface state which doesn't utilize an inventory.
+	 */
+	public InterfaceState() {
+		this.closed = new WrappedProperty<InterfaceCloseEvent>();
+		this.closeType = InterfaceCloseType.PLAYER;
+	}
+	
+	/**
 	 * Creates an InterfaceState with
 	 * the specified title and row count.
 	 * 
@@ -66,24 +74,27 @@ public abstract class InterfaceState {
 	
 	/**
 	 * Displays the interface state to the player.
-	 * 
-	 * @param player The player
 	 */
-	public void show(Player player) {
-		player.openInventory(inventory);
+	public void show() {
+		getOwner().openInventory(inventory);
 	}
 	
 	/**
 	 * Initializes and opens the interface
 	 * state to the player.
-	 * 
-	 * @param player The player
 	 */
-	public void open(Player player) {
+	public void open() {
 		initialize(components);
-		show(player);
+		show();
 		tick();
 		render();
+	}
+	
+	/**
+	 * Closes the interface on the player's side.
+	 */
+	public void close() {
+		getOwner().closeInventory();
 	}
 	
 	/**

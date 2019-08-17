@@ -2,6 +2,7 @@ package com.tek.rcore;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.tek.rcore.nms.CoreProtocolImpl;
 import com.tek.rcore.ui.InterfaceManager;
 
 public class RedstoneCore extends JavaPlugin {
@@ -10,6 +11,8 @@ public class RedstoneCore extends JavaPlugin {
 	private static RedstoneCore instance;
 	//InterfaceManager instance for other plugins to use
 	private InterfaceManager interfaceManager;
+	//ProtocolImplementation instance for internal use
+	private CoreProtocolImpl protocolImplementation;
 	
 	/**
 	 * Called when the plugin enables,
@@ -21,6 +24,8 @@ public class RedstoneCore extends JavaPlugin {
 		
 		interfaceManager = new InterfaceManager(this);
 		interfaceManager.register(10);
+		
+		protocolImplementation = new CoreProtocolImpl(this);
 	}
 	
 	/**
@@ -30,6 +35,7 @@ public class RedstoneCore extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		interfaceManager.disable();
+		protocolImplementation.close();
 	}
 	
 	/**
@@ -48,6 +54,15 @@ public class RedstoneCore extends JavaPlugin {
 	 */
 	public InterfaceManager getInterfaceManager() {
 		return interfaceManager;
+	}
+	
+	/**
+	 * Returns the protocol implementation.
+	 * 
+	 * @return The protocol implementation
+	 */
+	public CoreProtocolImpl getProtocolImplementation() {
+		return protocolImplementation;
 	}
 	
 }

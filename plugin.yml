@@ -2,7 +2,7 @@ name: RedstoneCore
 description: A set of utilities mostly focused on items and user interfaces.
 author: RedstoneTek
 
-version: 1.0.0
+version: 1.4.0
 api-version: 1.14
 main: com.tek.rcore.RedstoneCore
 
