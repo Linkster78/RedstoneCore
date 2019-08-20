@@ -109,7 +109,7 @@ public class InterfaceManager {
 		if(!userInterfaces.containsKey(player.getUniqueId())) return;
 		List<InterfaceState> states = userInterfaces.get(player.getUniqueId());
 		userInterfaces.remove(player.getUniqueId());
-		userInterfaces.get(player.getUniqueId()).get(0).close();
+		states.get(0).close();
 		for(int i = states.size() - 1; i >= 0; i--) {
 			InterfaceState state = states.get(i);
 			state.getClosedProperty().setValue(new InterfaceCloseEvent(player, InterfaceCloseType.PROGRAMMATICAL, state));
