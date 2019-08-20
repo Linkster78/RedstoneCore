@@ -88,7 +88,7 @@ public class PaginatedComponent extends InterfaceComponent {
 		
 		for(int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
-				int index = y * height + x;
+				int index = y * width + x;
 				if(index >= items.size()) break;
 				IPaginatedItem item = items.get(startIndex + index);
 				drawBuffer[this.x + x][this.y + y] = item.render(interfaceState);
