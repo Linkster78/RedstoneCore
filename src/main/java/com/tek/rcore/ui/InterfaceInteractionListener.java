@@ -216,9 +216,6 @@ public class InterfaceInteractionListener implements Listener {
 			InterfaceState state = interfaceStates.get().get(0);
 			if(state.getInventory().equals(event.getInventory())) {
 				if(!state.getCloseType().equals(InterfaceCloseType.IGNORED)) {
-					state.getClosedProperty().setValue(new InterfaceCloseEvent((Player) event.getPlayer(), state.getCloseType(), state));
-					state.setCloseType(InterfaceCloseType.PLAYER);
-					
 					if(!instance.getUserInterfaces().containsKey(event.getPlayer().getUniqueId())) return;
 					instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).remove(0);
 					if(instance.getUserInterfaces().get(event.getPlayer().getUniqueId()).isEmpty()) {
@@ -229,6 +226,11 @@ public class InterfaceInteractionListener implements Listener {
 							newState.show();
 						}, 0l);
 					}
+					
+					Bukkit.getScheduler().scheduleSyncDelayedTask(RedstoneCore.getInstance(), () -> {
+						state.getClosedProperty().setValue(new InterfaceCloseEvent((Player) event.getPlayer(), state.getCloseType(), state));
+						state.setCloseType(InterfaceCloseType.PLAYER);
+					}, 0l);
 				} else {
 					state.setCloseType(InterfaceCloseType.PLAYER);
 				}

@@ -46,7 +46,6 @@ public class SignInterface extends InterfaceState {
 				.setResponseCallback((player, lines) -> {
 					this.lines = lines;
 					
-					getClosedProperty().setValue(new InterfaceCloseEvent(getOwner(), InterfaceCloseType.PLAYER, this));		
 					InterfaceManager instance = RedstoneCore.getInstance().getInterfaceManager();
 					
 					if(!instance.getUserInterfaces().containsKey(getUUID())) return;
@@ -60,6 +59,10 @@ public class SignInterface extends InterfaceState {
 							newState.show();
 						}, 0l);
 					}
+					
+					Bukkit.getScheduler().scheduleSyncDelayedTask(RedstoneCore.getInstance(), () -> {
+						getClosedProperty().setValue(new InterfaceCloseEvent(getOwner(), InterfaceCloseType.PLAYER, this));		
+					}, 0l);
 				});
 	}
 	
